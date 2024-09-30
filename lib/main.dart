@@ -6,6 +6,8 @@ import 'package:flutter_application_1/features/user_auth/presentation/pages/home
 import 'package:flutter_application_1/features/user_auth/presentation/pages/login_page.dart';
 import 'package:flutter_application_1/features/user_auth/presentation/pages/setting_page.dart';
 import 'package:flutter_application_1/features/user_auth/presentation/pages/sign_up_page.dart';
+import 'global/provider/user_provider.dart';
+import 'package:get/get.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +25,7 @@ Future main() async {
   } else {
     await Firebase.initializeApp();
   }
-
+  Get.put(UserController());
   runApp(const MyApp());
 }
 
