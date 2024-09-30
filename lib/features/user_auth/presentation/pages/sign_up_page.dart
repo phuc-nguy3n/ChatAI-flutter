@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/features/repositories/firebase_repository.dart';
 import 'package:flutter_application_1/features/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
 import 'package:flutter_application_1/features/user_auth/presentation/pages/login_page.dart';
 import 'package:flutter_application_1/features/user_auth/presentation/widgets/form_container_widget.dart';
@@ -18,6 +19,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _cfPasswordController = TextEditingController();
+
+  final FirebaseRepository _firebaseRepository = FirebaseRepository();
 
   bool isSigningUp = false;
 
@@ -152,9 +155,10 @@ class _SignUpPageState extends State<SignUpPage> {
       isSigningUp = false;
     });
     if (user != null) {
+      await _firebaseRepository.createUser(user.uid, email);
       showToast(message: "User is successfully created");
       // ignore: use_build_context_synchronously
-      Navigator.pushReplacementNamed(context, "/home");
+      Navigator.pushReplacementNamed(context, "/login");
     } else {
       showToast(message: "Some error happend");
     }
