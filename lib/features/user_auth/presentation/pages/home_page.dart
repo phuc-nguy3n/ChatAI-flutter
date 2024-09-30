@@ -1,9 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/features/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
 import 'package:flutter_application_1/global/common/toast.dart';
+import 'package:flutter_application_1/global/provider/user_provider.dart';
+import 'package:get/get.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final FirebaseAuthService _auth = FirebaseAuthService();
+  final UserController _userController = Get.find<UserController>();
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +31,8 @@ class HomePage extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
-              FirebaseAuth.instance.signOut();
+              _auth.signOut();
+              _userController.setUser(null);
               Navigator.pushReplacementNamed(context, "/login");
               showToast(message: "Successfully signed out");
             },
