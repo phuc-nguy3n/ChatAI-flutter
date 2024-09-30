@@ -1,9 +1,14 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/features/repositories/firebase_repository.dart';
 import 'package:flutter_application_1/features/user_auth/presentation/pages/sign_up_page.dart';
 import 'package:flutter_application_1/features/user_auth/presentation/widgets/form_container_widget.dart';
 import 'package:flutter_application_1/global/common/toast.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_application_1/global/provider/user_provider.dart';
+import 'package:flutter_application_1/model/app_user.dart';
+import 'package:get/get.dart';
 
 import '../../firebase_auth_implementation/firebase_auth_services.dart';
 
@@ -17,9 +22,10 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _isSigning = false;
   final FirebaseAuthService _auth = FirebaseAuthService();
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final UserController _userController = Get.find<UserController>();
+  final FirebaseRepository _firebaseRepository = FirebaseRepository();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {
@@ -33,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text("Login"),
+        title: const Text("Login"),
       ),
       body: Center(
         child: Padding(
@@ -104,7 +110,8 @@ class _LoginPageState extends State<LoginPage> {
                     onTap: () {
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (context) => SignUpPage()),
+                        MaterialPageRoute(
+                            builder: (context) => const SignUpPage()),
                         (route) => false,
                       );
                     },
@@ -135,14 +142,21 @@ class _LoginPageState extends State<LoginPage> {
 
     User? user = await _auth.signInWithEmailAndPassword(email, password);
 
-    setState(() {
-      _isSigning = false;
-    });
-
     if (user != null) {
-      showToast(message: "User is successfully signed in");
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacementNamed(context, "/setting");
+      AppUser? userInfo = await _firebaseRepository.getUserById(user.uid);
+      if (userInfo != null) {
+        _userController.setUser(userInfo);
+        setState(() {
+          _isSigning = false;
+        });
+        showToast(message: "User is successfully login");
+
+        if (userInfo.name.isNotEmpty) {
+          Navigator.pushReplacementNamed(context, "/home");
+        } else {
+          Navigator.pushReplacementNamed(context, "/setting");
+        }
+      }
     } else {
       showToast(message: "some error occured");
     }
