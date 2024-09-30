@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../../../global/common/toast.dart';
 
 class FirebaseAuthService {
@@ -26,7 +25,9 @@ class FirebaseAuthService {
     try {
       UserCredential credential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
-      return credential.user;
+      User? user = credential.user;
+
+      return user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found' || e.code == 'wrong-password') {
         showToast(message: 'Invalid email or password.');
@@ -35,5 +36,9 @@ class FirebaseAuthService {
       }
     }
     return null;
+  }
+
+  Future<void> signOut() async {
+    await _auth.signOut();
   }
 }
