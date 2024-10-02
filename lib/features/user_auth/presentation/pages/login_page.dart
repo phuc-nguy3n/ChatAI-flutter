@@ -158,6 +158,9 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
     } else {
+      setState(() {
+        _isSigning = false;
+      });
       showToast(message: "some error occured");
     }
   }
