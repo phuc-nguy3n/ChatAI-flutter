@@ -6,6 +6,7 @@ import 'package:flutter_application_1/features/user_auth/presentation/pages/home
 import 'package:flutter_application_1/features/user_auth/presentation/pages/login_page.dart';
 import 'package:flutter_application_1/features/user_auth/presentation/pages/setting_page.dart';
 import 'package:flutter_application_1/features/user_auth/presentation/pages/sign_up_page.dart';
+import 'package:flutter_application_1/features/user_auth/presentation/pages/user_info_page.dart';
 import 'global/provider/user_provider.dart';
 import 'package:get/get.dart';
 
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         '/signUp': (context) => const SignUpPage(),
         '/home': (context) => const HomePage(),
         '/setting': (context) => const SettingPage(),
+        '/userInfo': (context) => const UserInfoPage(),
       },
     );
   }
