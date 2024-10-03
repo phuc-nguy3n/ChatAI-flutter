@@ -77,9 +77,13 @@ class _TextAndVoiceFieldState extends State<TextAndVoiceField> {
   void sendVoiceMessage() {}
 
   void sendTextMessage(String message) async {
-    final aiResponse = await _geminiAI.getResponse(message);
+    setReplyingState(true);
     addToChatList(message, true, DateTime.now().toString());
+    addToChatList('Typing...', false, 'typing');
+    final aiResponse = await _geminiAI.getResponse(message);
+    removeTyping();
     addToChatList(aiResponse, false, DateTime.now().toString());
+    setReplyingState(false);
   }
 
   void addToChatList(String message, bool isMe, String id) {
@@ -93,5 +97,16 @@ class _TextAndVoiceFieldState extends State<TextAndVoiceField> {
     chatController.chats.forEach((chat) {
       print('ID: ${chat.id}, Message: ${chat.message}, IsMe: ${chat.isMe}');
     });
+  }
+
+  void setReplyingState(bool isReplying) {
+    setState(() {
+      _isReplying = isReplying;
+    });
+  }
+
+  void removeTyping() {
+    final ChatController chatController = Get.find<ChatController>();
+    chatController.removeTyping();
   }
 }
