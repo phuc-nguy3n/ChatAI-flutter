@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/global/common/toast.dart';
 import 'package:flutter_application_1/global/provider/chats_provider.dart';
 import 'package:flutter_application_1/model/chat_model.dart';
 import 'package:flutter_application_1/services/ai_handler.dart';
+import 'package:flutter_application_1/services/voice_handler.dart';
 import 'package:flutter_application_1/widgets/toggle_button.dart';
 import 'package:get/get.dart';
 
@@ -18,8 +20,15 @@ class _TextAndVoiceFieldState extends State<TextAndVoiceField> {
   InputMode _inputMode = InputMode.voice;
   final _messageController = TextEditingController();
   final AIHandler _geminiAI = AIHandler();
+  final VoiceHandler voiceHandler = VoiceHandler();
   var _isReplying = false;
   var _isListening = false;
+
+  @override
+  void initState() {
+    voiceHandler.initSpeech();
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -59,8 +68,12 @@ class _TextAndVoiceFieldState extends State<TextAndVoiceField> {
           inputMode: _inputMode,
           sendTextMessage: () {
             final message = _messageController.text;
-            _messageController.clear();
-            sendTextMessage(message);
+            if (message != '') {
+              _messageController.clear();
+              sendTextMessage(message);
+            } else {
+              showToast(message: "Please enter promt");
+            }
           },
           sendVoiceMessage: sendVoiceMessage,
         ),
@@ -74,7 +87,21 @@ class _TextAndVoiceFieldState extends State<TextAndVoiceField> {
     });
   }
 
-  void sendVoiceMessage() {}
+  void sendVoiceMessage() async {
+    if (!voiceHandler.isEnabled) {
+      print('Not supported');
+      return;
+    }
+    if (voiceHandler.speechToText.isListening) {
+      await voiceHandler.stopListening();
+      setListeningState(false);
+    } else {
+      setListeningState(true);
+      final result = await voiceHandler.startListening();
+      setListeningState(false);
+      sendTextMessage(result);
+    }
+  }
 
   void sendTextMessage(String message) async {
     setReplyingState(true);
@@ -96,6 +123,12 @@ class _TextAndVoiceFieldState extends State<TextAndVoiceField> {
 
     chatController.chats.forEach((chat) {
       print('ID: ${chat.id}, Message: ${chat.message}, IsMe: ${chat.isMe}');
+    });
+  }
+
+  void setListeningState(bool isListening) {
+    setState(() {
+      _isListening = isListening;
     });
   }
 
