@@ -8,6 +8,13 @@ class UserController extends GetxController {
     user.value = newUser;
   }
 
+  void updateUsername(String newName) {
+    if (user.value != null) {
+      user.value!.name = newName;
+      user.refresh();
+    }
+  }
+
   bool isLoggedIn() {
     return user.value != null;
   }
