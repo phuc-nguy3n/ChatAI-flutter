@@ -10,16 +10,19 @@ class VoiceHandler {
     _speechEnabled = await _speechToText.initialize();
   }
 
-  Future<String> startListening() async {
-    final completer = Completer<String>();
+  Future<void> startListening({
+    required Function(String) onResult,
+    required Function onComplete,
+  }) async {
     _speechToText.listen(
       onResult: (result) {
+        onResult(result.recognizedWords);
+
         if (result.finalResult) {
-          completer.complete(result.recognizedWords);
+          onComplete();
         }
       },
     );
-    return completer.future;
   }
 
   Future<void> stopListening() async {
