@@ -97,9 +97,16 @@ class _TextAndVoiceFieldState extends State<TextAndVoiceField> {
       setListeningState(false);
     } else {
       setListeningState(true);
-      final result = await voiceHandler.startListening();
-      setListeningState(false);
-      sendTextMessage(result);
+      voiceHandler.startListening(
+        onResult: (result) {
+          _messageController.text = result;
+        },
+        onComplete: () async {
+          sendTextMessage(_messageController.text);
+          setListeningState(false);
+          _messageController.clear();
+        },
+      );
     }
   }
 
