@@ -84,6 +84,7 @@ class _SettingPageState extends State<SettingPage> {
         _isUpdating = true;
       });
       await _firebaseRepository.updateUserName(uid, username);
+      _userController.updateUsername(username);
       setState(() {
         _isUpdating = false;
       });
